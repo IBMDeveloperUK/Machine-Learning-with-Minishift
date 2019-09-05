@@ -1,6 +1,6 @@
 # Training and Deploying Machine Learning Models with Containers
 
-## Machine learning depenendencies are a hassle...
+## Machine learning dependencies are a hassle...
 
 Between ensuring that the right version Python/Pip are installed on your system, and that it doesn't conflict with other Python/Pip versions on your system AND that when you deploy your model to the cloud that the versions of the dependencies you've used in your projects are still compatible with the version on your cloud-based system, it's a wonder that we ever get any time to focus on building and training our neural networks.
 
@@ -13,6 +13,10 @@ With containers, we can create a clean, virtual environment to setup and train o
 As with everything in life, there are caveats to this approach. You are training your network on a virtualised system, so you're not going to get the full, raw power of your machine being utilised in the training process. Even with small networks, training can take quite some time, even longer inside a virtual environment. However, if you're a machine learning focussed developer with myriad networks to iterate and train, managing all of those dependencies can take hours to configure, and there's no guarentee that if there isn't a problem on your system, that there won't be when it's deployed to the production environment.
 
 Although this approach will take longer to train, the time savings in reducing the complexity of your setup should work to offset, *and* when you complete this workshop, you'll be able to deploy your model to a super-scalable OpenShift Cluser (if you so wish) where you can scale to meet the needs of your users in next to no time at all.
+
+## "Can't I just use a Virtual Environment instead?"
+
+Absolutely, if that works for you, go for it, but depending on the virtual environment you're using, it can be equally as awkward to prepare your project as managing the dependencies manually (in fact, I had the idea for this workshop after spending 6 hours fighting with my local environment). There's also guarentee that the environment you deploy your application to will have a matching configuration without some pre-emptive tweaking.
 
 ## "OK... I'm interested..."
 
