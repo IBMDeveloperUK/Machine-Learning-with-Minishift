@@ -1,4 +1,3 @@
-import sys
 import tensorflow as tf
 import keras
 from keras.datasets import mnist

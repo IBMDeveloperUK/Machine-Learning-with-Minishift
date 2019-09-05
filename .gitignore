@@ -2,3 +2,6 @@ __pycache__
 *.h5
 *.txt
 .DS_Store
+resources/.DS_Store
+reference/.DS_Store
+templates/.DS_Store
