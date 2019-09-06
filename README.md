@@ -241,3 +241,66 @@ Copy and paste the following line of code on a new line beneath our last snippet
 ```
 
 When our neural network has finished training, it's knowledge will be saved to a file "mnist.h5" in the same directory as our project.
+
+Save `train.py` and close it, we're finished here 💪
+
+## Serving Our Neural Network
+
+Once we've trained our neural network, we'll want to put it somewhere for people to use it, so we'll create a simple HTTP server with the Flask framework.
+
+For this, we'll be working in the `server.py` file. Open it up for editing in your favourite IDE.
+
+### Importing Dependencies
+
+As with our `train.py` we need to import the dependencies that our server will need to function - namely, Flask, Keras, and NumPy. Copy and paste the following code at the top of the `server.py` file.
+
+```python
+from flask import Flask, request
+from flask import render_template
+import keras, sys, json
+import numpy as np
+application = Flask(__name__)
+
+stored_model = None
+```
+
+We've also created two variables `application` and `stored_model`. `application` creates an instance of the Flask HTTP server that we can configure to listen for connections. The `stored_model` variable is where we'll load our trained model that we create when `train.py` is run. 
+
+Next, we need to define the paths that the server will serve resources on. Copy and paste the following block of code on a new line after `stored_model`:
+
+```python
+@application.route("/")
+def hello():
+    return render_template('index.html')
+
+@application.route("/predict", methods=['POST'])
+def classifyCharacter():
+    global stored_model
+
+    body = request.get_json()
+
+    reshapedData = np.array(body['data'])
+    reshapedData = reshapedData.reshape(1,28,28,1)
+
+    return json.dumps( { 'prediction' : int(stored_model.predict_classes( reshapedData )[0]) } ) 
+```
+
+Our first route will serve the `index.html` file from the `resources` folder (included when from the repo that we forked our copy from) when a request is made to `/` on our server.
+
+The second route will accept an array of pixel values passed in a JSON formatted array to `/predict`. These values will be reshaped to fit the dimensions that our neural network expects as input, and will then be classified by the network. The result of the neural network is then passed back as a response to the request in JSON formatted object. 
+
+Finally, we'll create a function which we will be able to trigger to start the server listening on a given port. Copy and paste the following below the last block of code.
+
+```python
+def start():
+    global stored_model
+
+    stored_model = keras.models.load_model('mnist.h5')
+    stored_model._make_predict_function()
+
+    application.run(host='0.0.0.0', port=8080)
+```
+
+Before we start listening for requests from client, we need to load our trained model for classifying our inputs with `keras.models.load_model('mnist.h5')`. 
+
+Once that's loaded, we'll tell our Flask server to start listening for requests. By default, MiniShift will pass through traffic to an application on port `8080`. As such, we will tell our server to listen for requests on that port.
