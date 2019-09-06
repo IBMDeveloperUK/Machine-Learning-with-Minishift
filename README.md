@@ -355,6 +355,7 @@ Now it's time for some Minishift goodness.
 
 ## Deploying our application to Minishift.
 
+### Creating our project + application
 If you didn't install and setup Minishift at the start of this tutorial with [Mofe's guide](https://github.com/IBMDeveloperUK/minishift101/tree/master/workshop), go and do that now.
 
 If you have, then it's time to fire Minishift up 🚀
@@ -374,3 +375,71 @@ Once minishift has finished spinning up, you should see an output in your termin
 Your https:// address will be different to the one displayed here.
 
 Copy that URL and enter it into your browser. You should be presented with a login dialog that looks like this:
+
+![A image showing the Minishift login page](/resources/minishift_login.png)
+
+For the username enter `developer`, for the password, enter anything you like at all.
+
+Once you've logged in, you'll be presented with the Minishift console. 
+
+![A image showing the Minishift console](/resources/minishift_console.png)
+
+Here, we can create a project and configure an app to be run. So let's do that!
+
+In the console page, there's a big, friendly "Python" button. Click it to start creating our project.
+
+![A image showing the Minishift project creation UI](/resources/minishift_project_creation.png)
+
+Fill in the values for project with the following values:
+
+#### Project Name
+keras-mnist
+
+#### Project Name
+keras-mnist
+
+#### Application Name
+mnist-recognition
+
+For the Git repository, we want to add the URL for the forked copy of the project Git repo that we just commited to. Head to your forked version and click the 'Clone or download' button again. Make sure to copy the HTTP version of the URL, as Minishift hasn't been configured to get source code over SSH. Paste that value into the Git Repository field and then click 'Next'.
+
+You'll then see a dialog describing the creation of your project and app. Click 'Close' when this process has finished.
+
+### Building our application
+
+At this point, Minishift will request the source code for our project and copy it to start the build process. On the right hand side of the console, you will see your newly created project. Click on it to head to the admin page for it.
+
+On the left-hand side of your console, you will see a list of options. Once our source code has been retrieved from GitHub, Minishift will start to build our app. We can check out how that's going by clicking on `Build` (highlighted in red), then `Builds` (highlighted in green) from the menu, and then clicking on the number for our build along side our app (highlighted in blue).
+
+![A image showing the Minishift admin dashboard](/resources/minishift_build.png)
+
+This will take us through to the build status page for our app. By clicking on `Logs` (highlighted in orange), we can track the progress of our apps build.
+
+![A image showing the Minishift app build dashboard](/resources/minishift_app_status_page.png)
+
+Which looks like this:
+
+![A image showing the Minishift app build dashboard](/resources/minishift_build_logs.png)
+
+### Training our network
+
+Once the build has finished, it will start our app!
+
+On first run, our app won't have a trained network for it to make classifications with, so it'll grab the MNIST dataset and start training the neural network we created in `train.py`.
+
+Depending on the system, this can take a while (what doesn't in machine learning?) but we can check on the status of the training from our console.
+
+To view the state of our app, we can click on `Applications` on the left hand side of the screen (highlighted in fuscia), and then `Deployments` (highlighted in green).
+
+![A image showing the Minishift app build dashboard](/resources/minishift_deploys.png)
+
+This takes us through to our deployments page. Click on the highlighted number under 'Last Version' for your app, and that will take you to the overview for your application.
+
+From here, we can click on the `Logs` tab (highlighted in red) to view the training progress of our neural network.
+
+![A image showing the Minishift app build overview](/resources/minishift_app_status_page.png)
+
+
+![A image showing the Minishift training logs](/resources/minishift_training_progress.png)
+
+This will take some time to complete, so finish up your last tea, and go and grab another ☕️
