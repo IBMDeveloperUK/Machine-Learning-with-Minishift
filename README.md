@@ -170,3 +170,74 @@ Here, we're first casting all of the values describing each image to floats. Nex
 `y_train` and `y_test` contain the labels of each of the images in our datasets (otherwise our neural network wouldn't know what any of the data in `x_train` or `x_test` actually meant). With `keras.utils.to_categorical(y_train, num_classes)` we're converting the labels to an index in a matrix which maps to the original categorisations of the images.
 
 ### Constructing our model
+
+For our project, we're going to create a basic 2-Dimensional Convolutional Neural Network. This architecture has been shown to be very effective at recognising patterns in images, and because it's a sequential model (a model data passes from each layer to the next) it's considered to be more more legible than other similarly tasked networks.
+
+Copy and paste the next code snippet on a new line after the last snippet we added.
+
+```python
+    model = Sequential()
+    model.add(Conv2D(32, kernel_size=(3, 3),
+                    activation='relu',
+                    input_shape=input_shape))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.25))
+    model.add(Flatten())
+    model.add(Dense(128, activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(num_classes, activation='softmax'))
+```
+
+Our first variable `model` is where we'll create a reference that we can use to construct each layer of neurons in our neural network.
+
+Next, we add a 2D Convolutional layer to our network with `model.add(Conv2D(32 kernel_size=(3, 3), activation='relu', input_shape=input_shape))`. This layer "convolves" around our image in an attempt to find patterns and structures that it can use in classifying our images. Adit Deshpande has written a [great blog post](https://adeshpande3.github.io/A-Beginner%27s-Guide-To-Understanding-Convolutional-Neural-Networks/) where you can read more about what's going on in this layer, if you're so inclined.
+
+We compound this effect with a second convolutional layer `model.add(Conv2D(64, (3, 3), activation='relu'))`.
+
+After that, with `model.add(MaxPooling2D(pool_size=(2, 2)))`, we create a pooling layer, which is akin to downsampling the results of the two previous layers so that only the most prevalent features pass through to the next layer.
+
+Our next layer is a "dropout" layer. This layer of neurons will randomly ignore input as the network is trained. This encourages the network to be more robust, by depending on a variety of connections between the next and previous layers, rather than relying on a we, heavily weighted connections which could possibly have too much of a say in the ultimate classifcation of the image. 
+
+Next, we flatten the input the input from our dropout layer with `model.add(Flatten())` into a 1-Dimensional array. Up until this point, our data has maintained the original shape, albeit modified, from when we passed it through to our network.
+
+The next layer, `model.add(Dense(128, activation='relu'))` a densely connected layer of neurons with a ReLu activation function serves to act as filter for neurons that have haven't received enough input to be activated. ReLu is a permissive activation function, so strong, and medium strength activations will be allowed to pass through and activate neurons in the next layer of our network, whereas weak activations will not. 
+
+Finally, we have two more layers of neurons. Another dropout layer, and another Densely connected layer. The final layer has the same number of outputs as the number of classes that we wish to categorise our images as. Each neuron corresponds to a label for each class, whichever neuron has the highest activation value will be the classification assigned to the image passed through to the network for training / prediction.
+
+### Compiling our model and training
+
+Now that we've constructed our model, it's time to compile it. This is the stage where we tell our neural networks how to measure it's success in categorising a given input, and start passing through data for training
+
+First, we'll copy and paste the code that will compile our model on a new line after out last code snippet.
+
+```python
+    model.compile(loss=keras.losses.categorical_crossentropy,
+                optimizer=keras.optimizers.Adadelta(),
+                metrics=['accuracy'])
+```
+
+And next, we'll start passing through our data with `model.fit()`
+
+```python
+    model.fit(x_train, y_train,
+            batch_size=batch_size,
+            epochs=epochs,
+            verbose=1,
+            validation_data=(x_test, y_test))
+    score = model.evaluate(x_test, y_test, verbose=0)
+    print('Test loss:', score[0])
+    print('Test accuracy:', score[1])
+```
+
+### Saving our model
+
+Once our network has been trained, it's time to save our model so we can use it later. Fortunately, this is a comparatively simple affair.
+
+Copy and paste the following line of code on a new line beneath our last snippet.
+
+```python
+    model.save('mnist.h5')
+```
+
+When our neural network has finished training, it's knowledge will be saved to a file "mnist.h5" in the same directory as our project.
