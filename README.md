@@ -443,3 +443,98 @@ From here, we can click on the `Logs` tab (highlighted in red) to view the train
 ![A image showing the Minishift training logs](/resources/minishift_training_progress.png)
 
 This will take some time to complete, so finish up your last tea, and go and grab another ☕️
+
+### Build complete! Time to play!
+
+After our model has finished training, our server will spin up and serve a web app that we can use to play with our newly created model.
+
+When the network has been trained, you'll see some output in your logs like the following:
+
+![A image showing the Minishift training logs](/resources/minishift_build_complete.png)
+
+The last line tells us that the server has successfully bound to the port we specified (8080) and that it's ready for traffic.
+
+Our application is running in a pod, so we can't directly access the URL provided, but Minishift is a natty little piece of software, so it very helpfully gives us a URL that we can use to access the server in our browser.
+
+To find the URL that we can access our app on, click on the `Applications` tab on the left-hand side of the screen (highlighted in yellow), and then click on `Routes` (highlighted in blue).
+
+![A image showing the Minishift routes tab](/resources/minishift_routes.png)
+
+This will take you to the 'Routes' page. Once there, click on your application name, and you'll be taken through to the routes admin page for your app.
+
+On this page, you'll see a URL (highlighted in red, but yours will be slightly different) that you can use to access the prediction web app that you may remember from the start of the document, and it's ready to go!
+
+![A image showing the public URL for our application pod](/resources/minishift_public_url.png)
+
+Click it, and you'll be taken to our application where you can click and draw a number which our neural network will classify!
+
+![A video demonstrating the classification web app](/resources/tada.gif)
+
+
+Go and have some fun, but then do come back here - We're not quite done yet.
+
+### Saving our model for the big time.
+
+So, we've trained our model, spun up our server, and classified some digits. It's been a ride, but we still need to do a few more small things to ready our app for the big time.
+
+Minishift deployments are ephemeral in nature. If we spin down our deployment, and then spin it back up again, it'll rebuild our application from scratch, so we'll lose our model! Now, we don't want to waste valueable cycles on a public infratructure retraining a model we've just trained locally, nor do we want to have our clusters waiting for an age while that completes. Fortunatelym it's possible to save our newly trained model and have it deploy with our application when we push it to a cloud environment.
+
+To do this, we're going to SSH into our pod and copy the file to our local system, where we'll commit it to our Git repo. This way, when we deploy on an *Openshift* cluster, the pre-trained model will be pulled from our repository and used straight away by our server - no further training required.
+
+Head back to your terminal and follow these steps...
+
+First, we need to make sure we can access the Openshift CLI tool. It _should_ have been setup when we installed Minishift, but it doesn't always behave, so we can load it into our environment by running the followind command:
+
+`eval $(minishift oc-env)`
+
+Next, we want to login with the oc CLI tool with our developer credentials (the same user we've been using in the GUI console - don't worry, you won't need to remember your password for this)
+
+`oc login -u developer`
+
+This will set our user for our following commands.
+
+Next, we want to get a list of pods in our deployment, which we can get with:
+
+`oc get pods`
+
+This should output something like this. 
+
+![A list of our pods](/resources/minishift_get_pods.png)
+
+If you, like me, have run multiple builds in Minishift, you may have multiple entries, but we're not interested in those, we're only interested in the running pod.
+
+Copy the pod name, and then run the following command to SSH into your machine
+
+`oc rsh <YOUR POD NAME>`
+
+This will give you a shell environemt that you can use to interact with your pod. At this point we want to run the following command to list the directory and find our apps current working path
+
+`ls -la && pwd`
+
+This will list all of the files and directories for our application, and then the working directory for our app, which should be something like `/opt/app-root/src`. Look familiar?
+
+![A list of our apps resources](/resources/minishift_directories.png)
+
+Notice how there's a file called `mnist.h5`. This is the file where our ML model is saved - that's what we want to save.
+
+Copy the path at the bottom of the output (that's the path to our apps working directory) and then type `exit`. This will close our SSH connection.
+
+With the path we've just copied, we're going to download the file to our local filesystem.
+
+Enter the following to download the `mnist.h5` file from our pod to our local filesystem
+
+`oc rsync <YOUR POD NAME>:/opt/app-root/src/mnist.h5 ./`
+
+This will write the `mnist.h5` file to your local filesystem. Hurrah!
+
+Now, we can commit that to our Git repository so that if we build our application again (either locally, or somewhere in the Cloud) it will use this pre-trained model instead of starting from scratch.
+
+To do this, enter:
+
+`git add .`
+
+`git commit -m "Saving pre-trained model for deployment"`
+
+`git push origin master`
+
+And Voila! We've learned how to build, train, and deploy a neural network with Minishift.
