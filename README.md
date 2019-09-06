@@ -4,7 +4,7 @@
 
 Between ensuring that the right version Python/Pip are installed on your system, and that it doesn't conflict with other Python/Pip versions on your system AND that when you deploy your model to the cloud that the versions of the dependencies you've used in your projects are still compatible with the version on your cloud-based system, it's a wonder that we ever get any time to focus on building and training our neural networks.
 
-Fortunately, there's a way to ensure that all of this is a never a problem again - Containers! (specifically, [MiniShift](https://github.com/minishift/minishift) )
+Fortunately, there's a way to ensure that all of this is a never a problem again - Containers! (specifically, [Minishift](https://github.com/minishift/minishift) )
 
 With containers, we can create a clean, virtual environment to setup and train our neural networks in, and then deploy them at scale with the _exact same_ same environment. No more dependency hell!
 
@@ -26,7 +26,7 @@ Cracking, then let's get started!
 
 1) How to build a Convolutional Neural Network (CNN) that can detect handwritten digits (with Keras and the MNIST dataset)
 2) How to train and deploy a CNN with the Flask web framework and Keras
-3) How to install and run MiniShift (a locally run OpenShift cluster of one image) on your machine
+3) How to install and run Minishift (a locally run OpenShift cluster of one image) on your machine
 4) How to create a project in OpenShift
 5) How to create an app in OpenShift and pull the source code for application from Github
 
@@ -36,12 +36,12 @@ By the end, you'll end up with a natty web app that will tell you what character
 
 ## Before We Start...
 
-It's probably best that you install MiniShift before we start diving into neural networking goodness. [Mofe Salami](https://twitter.com/Moffusa) has put together a [fantastic workshop](https://github.com/IBMDeveloperUK/minishift101/tree/master/workshop) that walks you through the installation and basic setup of MiniShift. If you pop on over there and follow just the setup steps of the workshop, and then head back here, we'll be good to crack on.
+It's probably best that you install Minishift before we start diving into neural networking goodness. [Mofe Salami](https://twitter.com/Moffusa) has put together a [fantastic workshop](https://github.com/IBMDeveloperUK/minishift101/tree/master/workshop) that walks you through the installation and basic setup of Minishift. If you pop on over there and follow just the setup steps of the workshop, and then head back here, we'll be good to crack on.
 
 ## You Will Need:
 
 1. A Github account
-2. A macOS/Windows/Linux system capable of running MiniShift
+2. A macOS/Windows/Linux system capable of running Minishift
 3. A modern web browser
 
 ## Recognising Handwritten Digits with Keras + the MNIST Dataset
@@ -56,7 +56,7 @@ Training neural networks (NNs) to classify handwritten digits has become somethi
 
 The code in this repo is a scaffold for the neural network and app that you'll end up with if you follow this workshop to the end.
 
-So we can get the full benefit of MiniShift's ability to pull code from a centralised repository and deploy it, you'll need to fork this repo to create your own version of it to work from.
+So we can get the full benefit of Minishift's ability to pull code from a centralised repository and deploy it, you'll need to fork this repo to create your own version of it to work from.
 
 You can do that with the following steps
 
@@ -81,7 +81,7 @@ This will create a copy of this repository that you'll be able to make changes t
 If you take a moment to look at the project you just cloned, you'll see a bunch of files and folders. Here is a brief description of each one
 
 1. `reference` - A complete implementation of the project that we'll be making.
-2. `app.py` - The main entry point for our program. When we run our project shortly, MiniShift will look for and execute this script
+2. `app.py` - The main entry point for our program. When we run our project shortly, Minishift will look for and execute this script
 3. `requirements.txt` - A text file which describes which dependencies our project will need to install to support our program.
 4. `server.py` - The code that will serve our prediction web app.
 5. `train.py` - The code that contains our neural network which will begin training the first time we run our app.
@@ -93,7 +93,7 @@ Before we can worry about training and/or deploying our neural network, we first
 
 With your favourite IDE, open the file `train.py`. This is where the code that creates, trains, and stores our model for later deployment will live.
 
-First, we need to import the dependencies that our project will need to run. You don't need to have these installed on your system, MiniShift will take care of this later.
+First, we need to import the dependencies that our project will need to run. You don't need to have these installed on your system, Minishift will take care of this later.
 
 In `train.py` copy and paste the following code block at the top of the file:
 
@@ -303,4 +303,74 @@ def start():
 
 Before we start listening for requests from client, we need to load our trained model for classifying our inputs with `keras.models.load_model('mnist.h5')`. 
 
-Once that's loaded, we'll tell our Flask server to start listening for requests. By default, MiniShift will pass through traffic to an application on port `8080`. As such, we will tell our server to listen for requests on that port.
+Once that's loaded, we'll tell our Flask server to start listening for requests. By default, Minishift will pass through traffic to an application on port `8080`. As such, we will tell our server to listen for requests on that port.
+
+## To train, or to serve?
+
+So, now we have code to train and code to serve it to people once it's ready, but how will Minishift know what to do when? 
+
+Simple! We'll write a little bit of code that will check if there's a model ready to be used, if there is, we'll start our server. If there isn't, then we'll train our model, and start the server when it's finished.
+
+When Minishift creates a pod with a Python application, it looks for an `app.py` file to run. In this file, we'll import our `train.py` and `serve.py` files as dependencies, check whether a model exists, and then act accordingly. 
+
+Open the empty `app.py` file in your favourite IDE, and add the following code block...
+
+```python
+import tensorflow as tf
+import os.path
+
+import server
+
+# Check if pre-trained model already exists
+if not os.path.exists('mnist.h5'):
+    import train
+
+    train.start()
+
+    print('Training complete. Starting server')
+    server.start()
+
+else:
+    print('Model exists. Starting server')
+    server.start()
+
+```
+... and then save and close it.
+
+That's it! We now have everything we need to train a model, serve the same model, and deploy it to an OpenShift cluster! 
+
+Now, after all of this hard work, it's time to put it somewhere the our Minishift cluster will be able to find it when it's time to spin up our cluster, so we'll commit our changes, and then push them back to GitHub.
+
+Head to your terminal and run the following commands in the directory you cloned your fork of the repo to:
+
+```git add .```
+
+```git commit -m "Application code"```
+
+```git push origin master```
+
+This will commit and push all of the files for our application to your GitHub repository.
+
+Now it's time for some Minishift goodness.
+
+## Deploying our application to Minishift.
+
+If you didn't install and setup Minishift at the start of this tutorial with [Mofe's guide](https://github.com/IBMDeveloperUK/minishift101/tree/master/workshop), go and do that now.
+
+If you have, then it's time to fire Minishift up 🚀
+
+In your terminal window execute the following to start Minishift:
+
+```minishift start --vm-driver hyperkit --network-nameserver 8.8.8.8```
+
+This will spin up the Minishift platform with the hyperkit driver, and allow local network traffic to access it.
+
+Depending on your system's resource, it may take a little while to spin up, so take the opportunity to go and grab a cup of tea.
+
+Once minishift has finished spinning up, you should see an output in your terminal a bit like the following:
+
+![A image showing the text output of Minishift once it's started](/resources/minishift_start.png)
+
+Your https:// address will be different to the one displayed here.
+
+Copy that URL and enter it into your browser. You should be presented with a login dialog that looks like this:
