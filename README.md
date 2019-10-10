@@ -28,7 +28,7 @@ Cracking, then let's get started!
 2) How to train and deploy a CNN with the Flask web framework and Keras
 3) How to install and run Minishift (a locally run OpenShift cluster of one image) on your machine
 4) How to create a project in OpenShift
-5) How to create an app in OpenShift and pull the source code for application from Github
+5) How to create an app in OpenShift and pull the source code for application from GitHub
 
 By the end, you'll end up with a natty web app that will tell you what characters you're drawing, that'll look like this:
 
@@ -40,7 +40,7 @@ It's probably best that you install Minishift before we start diving into neural
 
 ## You Will Need:
 
-1. A Github account
+1. A GitHub account
 2. A macOS/Windows/Linux system capable of running Minishift
 3. A modern web browser
 
@@ -60,7 +60,7 @@ So we can get the full benefit of Minishift's ability to pull code from a centra
 
 You can do that with the following steps
 
-1. If you've not done so already, log in to your Github account (or create one [here](https://github.com/join) .
+1. If you've not done so already, log in to your GitHub account (or create one [here](https://github.com/join) .
 2. Head back to this repository and then click the fork button at the very top of the UI. It looks like this:
 
 ![An image highlighting to fork button](/resources/fork_btn.png)
