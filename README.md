@@ -6,17 +6,17 @@ Between ensuring that the right version Python/Pip are installed on your system,
 
 Fortunately, there's a way to ensure that all of this is a never a problem again - Containers! (specifically, [Minishift](https://github.com/minishift/minishift) )
 
-With containers, we can create a clean, virtual environment to setup and train our neural networks in, and then deploy them at scale with the _exact same_ same environment. No more dependency hell!
+With containers, we can create a clean, virtual environment to setup and train our neural networks in and then deploy them at scale with the _exact same_ same environment. No more dependency hell!
 
 ## "But... won't that be slower?"
 
-As with everything in life, there are caveats to this approach. You are training your network on a virtualised system, so you're not going to get the full, raw power of your machine being utilised in the training process. Even with small networks, training can take quite some time, even longer inside a virtual environment. However, if you're a machine learning focussed developer with myriad networks to iterate and train, managing all of those dependencies can take hours to configure, and there's no guarentee that if there isn't a problem on your system, that there won't be when it's deployed to the production environment.
+As with everything in life, there are caveats to this approach. You are training your network on a virtualised system, so you're not going to get the full, raw power of your machine being utilised in the training process. Even with small networks training can take quite some time; even longer inside a virtual environment. However, if you're a machine learning focussed developer with myriad networks to iterate and train, managing all of those dependencies can take hours to configure and there's no guarantee that, if there isn't a problem on your system, there won't be when it's deployed to the production environment.
 
-Although this approach will take longer to train, the time savings in reducing the complexity of your setup should work to offset that, *and* when you complete this workshop, you'll be able to deploy your model to a super-scalable OpenShift Cluser (if you so wish) where you can scale to meet the needs of your users in next to no time at all.
+Although this approach will take longer to train, the time savings in reducing the complexity of your setup should work to offset that, *and* when you complete this workshop, you'll be able to deploy your model to a super-scalable OpenShift Cluster (if you so wish) where you can scale to meet the needs of your users in next to no time at all.
 
 ## "Can't I just use a Virtual Environment instead?"
 
-Absolutely, if that works for you, go for it, but depending on the virtual environment you're using, it can be equally as awkward to prepare your project as managing the dependencies manually (in fact, I had the idea for this workshop after spending 6 hours fighting with my local environment). There's also guarentee that the environment you deploy your application to will have a matching configuration without some pre-emptive tweaking.
+Absolutely, if that works for you, go for it, but depending on the virtual environment you're using, it can be equally as awkward to prepare your project as managing the dependencies manually (in fact, I had the idea for this workshop after spending 6 hours fighting with my local environment). There's also guarantee that the environment you deploy your application to will have a matching configuration without some pre-emptive tweaking.
 
 ## "OK... I'm interested..."
 
@@ -36,7 +36,7 @@ By the end, you'll end up with a natty web app that will tell you what character
 
 ## Before We Start...
 
-It's probably best that you install Minishift before we start diving into neural networking goodness. [Mofe Salami](https://twitter.com/Moffusa) has put together a [fantastic workshop](https://github.com/IBMDeveloperUK/minishift101/tree/master/workshop) that walks you through the installation and basic setup of Minishift. If you pop on over there and follow just the setup steps of the workshop, and then head back here, we'll be good to crack on.
+It's probably best that you install Minishift before we start diving into neural networking goodness. [Mofe Salami](https://twitter.com/Moffusa) has put together a [fantastic workshop](https://github.com/IBMDeveloperUK/minishift101/tree/master/workshop) that walks you through the installation and basic setup of Minishift. If you pop on over there and follow just the setup steps of the workshop, then head back here, we'll be good to crack on.
 
 ## You Will Need:
 
@@ -50,7 +50,7 @@ Training neural networks (NNs) to classify handwritten digits has become somethi
 
 1. The dataset is small, so the network can be trained in a short space of time.
 2. For a very long time, computers struggled to recognise natural human input, but with NNs the problem is essentially trivial to solve (we'll likely get a > 98% accuracy with the model we'll build)
-3. The architecture for recognizing handwritten digits is reuseable for wider image classification cases, so if you're looking to analyse visual datasets with CNNs, MNIST is a great way to cut your teeth.
+3. The architecture for recognising handwritten digits is reusable for wider image classification cases, so if you're looking to analyse visual datasets with CNNs, MNIST is a great way to cut your teeth.
 
 ## Starting Your Project
 
@@ -128,7 +128,7 @@ def start():
 
 The variables `batch_size`, `num_classes`, and `epochs` tell our program how to digit images to load into memory and pass through our network (`batch_size`), how many different types of digits (or classes) there are (`num_classes`), and how many times to pass the entire set through the neural network during the training phase `epochs`.
 
-`img_rows, img_cols = 28, 28` will be used by our neural network to determine the _shape of our data_. Described [here](https://towardsdatascience.com/understanding-input-and-output-shapes-in-convolution-network-keras-f143923d56ca) as: 
+`img_rows, img_cols = 28, 28` will be used by our neural network to determine the _shape of our data_. Described [here](https://towardsdatascience.com/understanding-input-and-output-shapes-in-convolution-network-keras-f143923d56ca) as:
 
 ***"[...] input data has a shape of (batch_size, height, width, depth), where the first dimension represents the batch size of the image and other three dimensions represent dimensions of the image which are height, width and depth. For some of you who are wondering what is the depth of the image, it’s nothing but the number of colour channel. For example, RGB image would have a depth of 3 and the greyscale image would have a depth of 1."***
 
@@ -149,7 +149,7 @@ Beneath that, copy and paste the following code snippet. Be sure to maintain the
 
 Depending on the data being processed, some image datasets will have their data stored in a 3-Dimensional array in the following order `[channels][rows][cols]` - This is called _"channel-first"_ data. Conversely, other image datasets will have their information stored `[rows][cols][channels]` - _"channel-last"_. This little snippet of code is just a little bit of sugar that sets up our neural network to receive the information regardless of which way around it is.
 
-The next snippet of code is the final bit of processing of our dataset neccessary to pass it through the network we're about to construct. Copy the following code block and paste it on a new line just after the last code snippet.
+The next snippet of code is the final bit of processing of our dataset necessary to pass it through the network we're about to construct. Copy the following code block and paste it on a new line just after the last code snippet.
 
 ```python
     x_train = x_train.astype('float32')
@@ -171,7 +171,7 @@ Here, we're first casting all of the values describing each image to floats. Nex
 
 ### Constructing our model
 
-For our project, we're going to create a basic 2-Dimensional Convolutional Neural Network. This architecture has been shown to be very effective at recognising patterns in images, and because it's a sequential model (a model data passes from each layer to the next) it's considered to be more more legible than other similarly tasked networks.
+For our project, we're going to create a basic 2-Dimensional Convolutional Neural Network. This architecture has been shown to be very effective at recognising patterns in images and because it's a sequential model (a model data passes from each layer to the next) it's considered to be much more legible than other similarly tasked networks.
 
 Copy and paste the next code snippet on a new line after the last snippet we added.
 
@@ -197,13 +197,13 @@ We compound this effect with a second convolutional layer `model.add(Conv2D(64, 
 
 After that, with `model.add(MaxPooling2D(pool_size=(2, 2)))`, we create a pooling layer, which is akin to downsampling the results of the two previous layers so that only the most prevalent features pass through to the next layer.
 
-Our next layer is a "dropout" layer. This layer of neurons will randomly ignore input as the network is trained. This encourages the network to be more robust, by depending on a variety of connections between the next and previous layers, rather than relying on a we, heavily weighted connections which could possibly have too much of a say in the ultimate classifcation of the image. 
+Our next layer is a "dropout" layer. This layer of neurons will randomly ignore input as the network is trained. This encourages the network to be more robust, by depending on a variety of connections between the next and previous layers, rather than relying on a few, heavily weighted connections which could possibly have too much of a say in the ultimate classifcation of the image.
 
-Next, we flatten the input the input from our dropout layer with `model.add(Flatten())` into a 1-Dimensional array. Up until this point, our data has maintained the original shape, albeit modified, from when we passed it through to our network.
+Next, we flatten the input from our dropout layer with `model.add(Flatten())` into a 1-Dimensional array. Up until this point, our data has maintained the original shape, albeit modified, from when we passed it through to our network.
 
-The next layer, `model.add(Dense(128, activation='relu'))` a densely connected layer of neurons with a ReLu activation function serves to act as filter for neurons that have haven't received enough input to be activated. ReLu is a permissive activation function, so strong, and medium strength activations will be allowed to pass through and activate neurons in the next layer of our network, whereas weak activations will not. 
+The next layer, `model.add(Dense(128, activation='relu'))` a densely connected layer of neurons with a ReLu activation function serves to act as filter for neurons that have haven't received enough input to be activated. ReLu is a permissive activation function. Strong and medium strength activations will be allowed to pass through and activate neurons in the next layer of our network whereas weak activations will not.
 
-Finally, we have two more layers of neurons. Another dropout layer, and another Densely connected layer. The final layer has the same number of outputs as the number of classes that we wish to categorise our images as. Each neuron corresponds to a label for each class, whichever neuron has the highest activation value will be the classification assigned to the image passed through to the network for training / prediction.
+Finally, we have two more layers of neurons. Another dropout layer, and another Densely connected layer. The final layer has the same number of outputs as the number of classes that we wish to categorise our images as. Each neuron corresponds to a label for each class. Whichever neuron has the highest activation value will be the classification assigned to the image passed through to the network for training / prediction.
 
 ### Compiling our model and training
 
@@ -264,7 +264,7 @@ application = Flask(__name__)
 stored_model = None
 ```
 
-We've also created two variables `application` and `stored_model`. `application` creates an instance of the Flask HTTP server that we can configure to listen for connections. The `stored_model` variable is where we'll load our trained model that we create when `train.py` is run. 
+We've also created two variables `application` and `stored_model`. `application` creates an instance of the Flask HTTP server that we can configure to listen for connections. The `stored_model` variable is where we'll load our trained model that we create when `train.py` is run.
 
 Next, we need to define the paths that the server will serve resources on. Copy and paste the following block of code on a new line after `stored_model`:
 
@@ -282,14 +282,14 @@ def classifyCharacter():
     reshapedData = np.array(body['data'])
     reshapedData = reshapedData.reshape(1,28,28,1)
 
-    return json.dumps( { 'prediction' : int(stored_model.predict_classes( reshapedData )[0]) } ) 
+    return json.dumps( { 'prediction' : int(stored_model.predict_classes( reshapedData )[0]) } )
 ```
 
 Our first route will serve the `index.html` file from the `resources` folder (included when from the repo that we forked our copy from) when a request is made to `/` on our server.
 
-The second route will accept an array of pixel values passed in a JSON formatted array to `/predict`. These values will be reshaped to fit the dimensions that our neural network expects as input, and will then be classified by the network. The result of the neural network is then passed back as a response to the request in JSON formatted object. 
+The second route will accept an array of pixel values passed in a JSON formatted array to `/predict`. These values will be reshaped to fit the dimensions that our neural network expects as input, and will then be classified by the network. The result of the neural network is then passed back as a response to the request as a JSON formatted object.
 
-Finally, we'll create a function which we will be able to trigger to start the server listening on a given port. Copy and paste the following below the last block of code.
+Finally, we'll create a function which will start the server listening on a given port. Copy and paste the following below the last block of code.
 
 ```python
 def start():
@@ -301,17 +301,17 @@ def start():
     application.run(host='0.0.0.0', port=8080)
 ```
 
-Before we start listening for requests from client, we need to load our trained model for classifying our inputs with `keras.models.load_model('mnist.h5')`. 
+Before we start listening for requests from client, we need to load our trained model for classifying our inputs with `keras.models.load_model('mnist.h5')`.
 
 Once that's loaded, we'll tell our Flask server to start listening for requests. By default, Minishift will pass through traffic to an application on port `8080`. As such, we will tell our server to listen for requests on that port.
 
 ## To train, or to serve?
 
-So, now we have code to train and code to serve it to people once it's ready, but how will Minishift know what to do when? 
+So, now we have code to train our model and code to serve it to people once it's ready, but how will Minishift know what to do when?
 
-Simple! We'll write a little bit of code that will check if there's a model ready to be used, if there is, we'll start our server. If there isn't, then we'll train our model, and start the server when it's finished.
+Simple! We'll write a little bit of code that will check if there's a model ready to be used. If there is, we'll start our server. If there isn't, we'll train our model, and then start the server when it's finished.
 
-When Minishift creates a pod with a Python application, it looks for an `app.py` file to run. In this file, we'll import our `train.py` and `serve.py` files as dependencies, check whether a model exists, and then act accordingly. 
+When Minishift creates a pod with a Python application, it looks for an `app.py` file to run. In this file, we'll import our `train.py` and `serve.py` files as dependencies, check whether a model exists, and then act accordingly.
 
 Open the empty `app.py` file in your favourite IDE, and add the following code block...
 
@@ -337,17 +337,17 @@ else:
 ```
 ... and then save and close it.
 
-That's it! We now have everything we need to train a model, serve the same model, and deploy it to an OpenShift cluster! 
+That's it! We now have everything we need to train a model, serve the same model, and deploy it to an OpenShift cluster!
 
-Now, after all of this hard work, it's time to put it somewhere the our Minishift cluster will be able to find it when it's time to spin up our cluster, so we'll commit our changes, and then push them back to GitHub.
+Now, after all of this hard work, it's time to put it somewhere that our Minishift cluster will be able to find it, so we'll commit our changes and then push them back to GitHub.
 
 Head to your terminal and run the following commands in the directory you cloned your fork of the repo to:
 
-```git add .```
+`git add .`
 
-```git commit -m "Application code"```
+`git commit -m "Application code"`
 
-```git push origin master```
+`git push origin master`
 
 This will commit and push all of the files for our application to your GitHub repository.
 
@@ -362,7 +362,7 @@ If you have, then it's time to fire Minishift up 🚀
 
 In your terminal window execute the following to start Minishift:
 
-```minishift start --vm-driver hyperkit --network-nameserver 8.8.8.8```
+`minishift start --vm-driver hyperkit --network-nameserver 8.8.8.8`
 
 This will spin up the Minishift platform with the hyperkit driver, and allow local network traffic to access it.
 
@@ -380,7 +380,7 @@ Copy that URL and enter it into your browser. You should be presented with a log
 
 For the username enter `developer`, for the password, enter anything you like at all.
 
-Once you've logged in, you'll be presented with the Minishift console. 
+Once you've logged in, you'll be presented with the Minishift console.
 
 ![A image showing the Minishift console](/resources/minishift_console.png)
 
@@ -477,7 +477,7 @@ Go and have some fun, but then do come back here - We're not quite done yet.
 
 So, we've trained our model, spun up our server, and classified some digits. It's been a ride, but we still need to do a few more small things to ready our app for the big time.
 
-Minishift deployments are ephemeral in nature. If we spin down our deployment, and then spin it back up again, it'll rebuild our application from scratch, so we'll lose our model! Now, we don't want to waste valueable cycles on a public infratructure retraining a model we've just trained locally, nor do we want to have our clusters waiting for an age while that completes. Fortunatelym it's possible to save our newly trained model and have it deploy with our application when we push it to a cloud environment.
+Minishift deployments are ephemeral in nature. If we spin down our deployment, and then spin it back up again, it'll rebuild our application from scratch, so we'll lose our model! Now, we don't want to waste valuable cycles on public infrastructure retraining a model we've just trained locally, nor do we want to have our clusters waiting for an age while that completes. Fortunately it's possible to save our newly trained model and have it deploy with our application when we push it to a cloud environment.
 
 To do this, we're going to SSH into our pod and copy the file to our local system, where we'll commit it to our Git repo. This way, when we deploy on an *Openshift* cluster, the pre-trained model will be pulled from our repository and used straight away by our server - no further training required.
 
@@ -497,7 +497,7 @@ Next, we want to get a list of pods in our deployment, which we can get with:
 
 `oc get pods`
 
-This should output something like this. 
+This should output something like this.
 
 ![A list of our pods](/resources/minishift_get_pods.png)
 
